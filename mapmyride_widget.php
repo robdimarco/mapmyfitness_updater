@@ -29,8 +29,7 @@ Author URI: http://www.416software.com
     under certain conditions.
     
     Contact at http://www.innovationontherun.com
-*/<?php
-/*
+
 Plugin Name: MapMyRide Widget
 Plugin URI: http://www.innovationontherun.com/plugin/mapmyride
 Description: MapMyRideWidget
@@ -39,7 +38,7 @@ Version: 1
 Author URI: http://www.innovationontherun.com/
 */
 require_once ABSPATH.WPINC.'/rss.php';
-function mapMyRide($rss, $args = array()) 
+function mapmyride($rss, $args = array()) 
 {
 	if ( is_string( $rss ) ) {
 		require_once(ABSPATH . WPINC . '/rss.php');
@@ -59,9 +58,6 @@ function mapMyRide($rss, $args = array())
 	$items = (int) $items;
 	if ( $items < 1 || 20 < $items )
 		$items = 10;
-	$show_summary  = (int) $show_summary;
-	$show_author   = (int) $show_author;
-	$show_date     = (int) $show_date;
 
 	if ( is_array( $rss->items ) && !empty( $rss->items ) ) {
 		$rss->items = array_slice($rss->items, 0, $items);
@@ -73,59 +69,23 @@ function mapMyRide($rss, $args = array())
 			$title = attribute_escape(strip_tags($item['title']));
 			if ( empty($title) )
 				$title = __('Untitled');
-			$desc = '';
-				if ( isset( $item['description'] ) && is_string( $item['description'] ) )
-					$desc = str_replace(array("\n", "\r"), ' ', attribute_escape(strip_tags(html_entity_decode($item['description'], ENT_QUOTES))));
-				elseif ( isset( $item['summary'] ) && is_string( $item['summary'] ) )
-					$desc = str_replace(array("\n", "\r"), ' ', attribute_escape(strip_tags(html_entity_decode($item['summary'], ENT_QUOTES))));
+			$desc = str_replace(array("\n", "\r"), ' ', $item['description']);
 
-			$summary = '';
-			if ( isset( $item['description'] ) && is_string( $item['description'] ) )
-				$summary = $item['description'];
-			elseif ( isset( $item['summary'] ) && is_string( $item['summary'] ) )
-				$summary = $item['summary'];
-
-			$desc = str_replace(array("\n", "\r"), ' ', attribute_escape(strip_tags(html_entity_decode($summary, ENT_QUOTES))));
-
-			if ( $show_summary ) {
-				$desc = '';
-				$summary = wp_specialchars( $summary );
-				$summary = "<div class='rssSummary'>$summary</div>";
-			} else {
-				$summary = '';
-			}
-
-			$date = '';
-			if ( $show_date ) {
-				if ( isset($item['pubdate']) )
-					$date = $item['pubdate'];
-				elseif ( isset($item['published']) )
-					$date = $item['published'];
-
-				if ( $date ) {
-					if ( $date_stamp = strtotime( $date ) )
-						$date = '<span class="rss-date">' . date_i18n( get_option( 'date_format' ), $date_stamp ) . '</span>';
-					else
-						$date = '';
-				}
-			}
-
-			$author = '';
-			if ( $show_author ) {
-				if ( isset($item['dc']['creator']) )
-					$author = ' <cite>' . wp_specialchars( strip_tags( $item['dc']['creator'] ) ) . '</cite>';
-				elseif ( isset($item['author_name']) )
-					$author = ' <cite>' . wp_specialchars( strip_tags( $item['author_name'] ) ) . '</cite>';
-			}
-
-			echo "<li><a class='rsswidget' href='$link' title='$desc'>$title</a>{$date}{$summary}{$author}</li>";
+			echo "<li><a class='rsswidget' href='$link' title='$title'>$title</a>{$desc}</li>";
 		}
 		echo '</ul>';
 	} else {
 		echo '<ul><li>' . __( 'An error has occurred; the feed is probably down. Try again later.' ) . '</li></ul>';
 	}
 }
-function widget_mapMyRide($args) {
+function widget_mapmyride($args=array() ) {
+    $options = get_option("widget_mapmyride");
+    $url = $options['url'];
+	while ( strstr($url, 'http') != $url )
+		$url = substr($url, 1);
+	if ( empty($url) )
+		return;
+
     $rss = fetch_rss($url);
     $link = clean_url(strip_tags($rss->channel['link']));
 	while ( strstr($link, 'http') != $link )
@@ -147,39 +107,58 @@ function widget_mapMyRide($args) {
 
 	echo $before_widget;
 	echo $before_title . $title . $after_title;
-    mapMyRide($rss);
+    mapmyride($rss, $options);
 	echo $after_widget;
 }
 
-function mapMyRide_control() 
+function widget_mapmyride_control() 
 {
-  $options = get_option("widget_mapMyRide");
+  $options = get_option("widget_mapmyride");
   
   if (!is_array( $options ))
   {
-		$options = array('url' => ''); 
+		$options = array('url' => '', 'items' => '10'); 
   }      
   
-  if ($_POST['mapMyRide-Submit']) 
+  if ($_POST['mapmyride-submit']) 
   {
-    $options['url'] = htmlspecialchars($_POST['mapMyRide-URL']);
-    update_option("widget_mapMyRide", $options);
+    $options['url'] = htmlspecialchars($_POST['mapmyride-url']);
+    $options['items'] = htmlspecialchars($_POST['mapmyride-items']);
+    update_option("widget_mapmyride", $options);
   }
   
 ?>
   <p>
-    <label for="mapMyRide-URL">Map My Ride RSS URL: </label>
-    <input type="text" id="mapMyRide-URL" name="mapMyRide-URL" value="<?php echo $options['url'];?>" />
-    <input type="hidden" id="mapMyRide-Submit" name="mapMyRide-Submit" value="1" />
+    <label style="font-weight:bold" for="mapmyride-url">Map My Ride RSS Feed URL: </label>
+    <input type="text" id="mapmyride-url" name="mapmyride-url" value="<?php echo $options['url'];?>" />
+    <input type="hidden" id="mapmyride-submit" name="mapmyride-submit" value="1" />
+    <p style="font-size:90%">This URL can be found by clicking on the <a href="http://www.mapmyride.com/training_data">Data Center</a> at MapMyRide.com and looking for the link <span style="font-weight:bold">RSS Feed for your Workouts</span></p>
   </p>
+  	<p>
+		<label for="mapmyride-items"><?php _e('How many workouts would you like to display?'); ?>
+			<select id="mapmyride-items" name="mapmyride-items">
+				<?php
+					for ( $i = 1; $i <= 20; ++$i )
+						echo "<option value='$i' " . ( $options['items'] == $i ? "selected='selected'" : '' ) . ">$i</option>";
+				?>
+			</select>
+		</label>
+	</p>
+
 <?php
 
 }
 
-function mapMyRide_init()
+function mapmyride_init()
 {
-  register_sidebar_widget(__('Map My Ride'), 'widget_mapMyRide');     
-  register_widget_control(   'Map My Ride', 'mapMyRide_control', 300, 200 );     
+
+    if(function_exists('wp_register_sidebar_widget') && function_exists('wp_register_widget_control')) {
+    	wp_register_sidebar_widget('mapmyride', 'Map My Ride Workouts', 'widget_mapmyride', array('classname' => 'widget_mapmyride', 'description' => 'Share your MapMyRide workouts on your blog.'));
+    	wp_register_widget_control('mapmyride', 'Map My Ride Workouts', 'widget_mapmyride_control', array('width' => 400, 'height' => 300));
+    } else {
+	    register_sidebar_widget(__('Map My Ride Workouts'), 'widget_mapmyride');     
+        register_widget_control(   'Map My Ride Workouts', 'widget_mapmyride_control', 400, 300 );     
+    }
 }
-add_action("plugins_loaded", "mapMyRide_init");
+add_action("plugins_loaded", "mapmyride_init");
 ?>
