@@ -69,9 +69,13 @@ function mapmyride($rss, $args = array())
 			$title = attribute_escape(strip_tags($item['title']));
 			if ( empty($title) )
 				$title = __('Untitled');
-			$desc = str_replace(array("\n", "\r"), ' ', $item['description']);
-
-			echo "<li><a class='rsswidget' href='$link' title='$title'>$title</a><br/>{$desc}</li>";
+			$workoutData = preg_split("/<br *\/>/",str_replace(array("\n", "\r"), ' ', $item['description']));
+			echo "<li><a class='rsswidget' href='$link' title='$title'>$title</a>";
+			foreach ($workoutData as $workout) {
+			    $vals = preg_split("/<\/?b *>/", $workout);
+			    echo "<p><b>".attribute_escape(strip_tags(html_entity_decode($vals[1], ENT_QUOTES)))."</b> ".attribute_escape(strip_tags(html_entity_decode($vals[2], ENT_QUOTES)))."</p>";
+			}
+			echo "</li>";
 		}
 		echo '</ul>';
 	} else {
@@ -104,11 +108,7 @@ function widget_mapmyride($args, $widget_args = 1) {
 	if ( empty($title) )
 		$title = __('Unknown Feed');
 	$url = clean_url(strip_tags($url));
-	if ( file_exists(dirname(__FILE__) . '/rss.png') )
-		$icon = str_replace(ABSPATH, get_option('siteurl').'/', dirname(__FILE__)) . '/rss.png';
-	else
-		$icon = get_option('siteurl').'/wp-includes/images/rss.png';
-	$title = "<a class='rsswidget' href='$url' title='" . attribute_escape(__('Syndicate this content')) ."'><img style='background:orange;color:white;border:none;' width='14' height='14' src='$icon' alt='RSS' /></a> <a class='rsswidget' href='$link' title='$desc'>$title</a>";
+	$title = "<a class='rsswidget' href='$link'>Recent Workouts from MapMyRide.com</a>";
 
 	echo $before_widget;
 	echo $before_title . $title . $after_title;
