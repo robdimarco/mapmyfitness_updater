@@ -71,14 +71,19 @@ function mapmyride($rss, $args = array())
 				$title = __('Untitled');
 			$desc = str_replace(array("\n", "\r"), ' ', $item['description']);
 
-			echo "<li><a class='rsswidget' href='$link' title='$title'>$title</a>{$desc}</li>";
+			echo "<li><a class='rsswidget' href='$link' title='$title'>$title</a><br/>{$desc}</li>";
 		}
 		echo '</ul>';
 	} else {
 		echo '<ul><li>' . __( 'An error has occurred; the feed is probably down. Try again later.' ) . '</li></ul>';
 	}
 }
-function widget_mapmyride($args=array() ) {
+function widget_mapmyride($args, $widget_args = 1) {
+	extract($args, EXTR_SKIP);
+	if ( is_numeric($widget_args) )
+		$widget_args = array( 'number' => $widget_args );
+	$widget_args = wp_parse_args( $widget_args, array( 'number' => -1 ) );
+	extract($widget_args, EXTR_SKIP);
     $options = get_option("widget_mapmyride");
     $url = $options['url'];
 	while ( strstr($url, 'http') != $url )
@@ -117,7 +122,13 @@ function widget_mapmyride_control()
   
   if (!is_array( $options ))
   {
-		$options = array('url' => '', 'items' => '10'); 
+		$options = array('url' => '', 'items' => '10', 
+		'show_date' =>1, 
+		'show_reps' =>1, 
+		'show_cals' =>1,
+		'show_weight' =>1,
+		'show_distance' =>1,
+		'show_duration' => 1); 
   }      
   
   if ($_POST['mapmyride-submit']) 
