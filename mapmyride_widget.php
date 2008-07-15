@@ -133,7 +133,9 @@ function widget_mapmyride_control()
   
   if ($_POST['mapmyride-submit']) 
   {
-    $options['url'] = htmlspecialchars($_POST['mapmyride-url']);
+    $url = $_POST['mapmyride-url'];
+    preg_match("/u=\d+/", $url, $matches);
+    $options['url'] = "http://www.mapmyride.com/rss/rss_workouts?" . $matches[0];
     $options['items'] = htmlspecialchars($_POST['mapmyride-items']);
     update_option("widget_mapmyride", $options);
   }
