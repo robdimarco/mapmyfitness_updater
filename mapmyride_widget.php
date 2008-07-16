@@ -31,13 +31,35 @@ Author URI: http://www.416software.com
     Contact at http://www.innovationontherun.com
 
 Plugin Name: MapMyRide Widget
-Plugin URI: http://www.innovationontherun.com/plugin/mapmyride
+Plugin URI: http://www.innovationontherun.com/mapmyride-wordpress-plugin-released
 Description: MapMyRideWidget
 Author: Rob Di Marco
-Version: 1
+Version: 1.0.1
 Author URI: http://www.innovationontherun.com/
 */
-require_once ABSPATH.WPINC.'/rss.php';
+if (!defined('RUNNER_ICON_URL'))
+    define('RUNNER_ICON_URL', "http://static.mapmyfitness.com/v3/images/icon_running.gif");
+if (!defined('SWIMMER_ICON_URL'))
+    define('SWIMMER_ICON_URL', "http://static.mapmyfitness.com/v3/images/icon_swimming.gif");
+if (!defined('GYM_ICON_URL'))
+    define('GYM_ICON_URL', "http://static.mapmyfitness.com/v3/images/icon_gym.gif");
+if (!defined('CYCLING_ICON_URL'))
+    define('CYCLING_ICON_URL', "http://static.mapmyfitness.com/v3/images/icon_cycling.gif");
+   
+function determineWorkoutType($title) {
+    $vals = array("CYCLING" => array("cycl","bike", "bicycl"),
+    "RUNNING" => array("run","walk"),
+    "SWIMMING" => array("swim"),
+    "GYM" => array("lift", "gym"));
+    foreach($vals as $key => $exps) {
+        foreach ($exps as $re) {
+            if (preg_match("/$re/", strtolower($title))) {
+                return $key;
+            }
+        }
+    }
+    return "";
+} 
 function mapmyride($rss, $args = array()) 
 {
 	if ( is_string( $rss ) ) {
@@ -70,7 +92,23 @@ function mapmyride($rss, $args = array())
 			if ( empty($title) )
 				$title = __('Untitled');
 			$workoutData = preg_split("/<br *\/>/",str_replace(array("\n", "\r"), ' ', $item['description']));
-			echo "<li><a class='rsswidget' href='$link' title='$title'>$title</a>";
+			$liStyle = "";
+            $workoutType = determineWorkoutType($title);
+			if ($workoutType != "") {
+			    $img = "";
+			    if ($workoutType == "CYCLING") {
+			        $img = CYCLING_ICON_URL;
+			    } elseif ($workoutType == "RUNNING") {
+			        $img = RUNNER_ICON_URL;
+			    } elseif ($workoutType == "SWIMMING") {
+			        $img = SWIMMER_ICON_URL;
+			    } elseif ($workoutType == "GYM") {
+			        $img = GYM_ICON_URL;
+			    }
+			    $liStyle .= "background: transparent url($img) no-repeat";
+			}
+			
+			echo "<li style='$liStyle'><a class='$linkClass' href='$link' title='$title'>$title</a>";
 			foreach ($workoutData as $workout) {
 			    $vals = preg_split("/<\/?b *>/", $workout);
 			    echo "<p><b>".attribute_escape(strip_tags(html_entity_decode($vals[1], ENT_QUOTES)))."</b> ".attribute_escape(strip_tags(html_entity_decode($vals[2], ENT_QUOTES)))."</p>";
@@ -94,7 +132,8 @@ function widget_mapmyride($args, $widget_args = 1) {
 		$url = substr($url, 1);
 	if ( empty($url) )
 		return;
-
+    
+	require_once(ABSPATH . WPINC . '/rss.php');
     $rss = fetch_rss($url);
     $link = clean_url(strip_tags($rss->channel['link']));
 	while ( strstr($link, 'http') != $link )
@@ -145,7 +184,7 @@ function widget_mapmyride_control()
     <label style="font-weight:bold" for="mapmyride-url">Map My Ride RSS Feed URL: </label>
     <input type="text" id="mapmyride-url" name="mapmyride-url" value="<?php echo $options['url'];?>" />
     <input type="hidden" id="mapmyride-submit" name="mapmyride-submit" value="1" />
-    <p style="font-size:90%">This URL can be found by clicking on the <a href="http://www.mapmyride.com/training_data">Data Center</a> at MapMyRide.com and looking for the link <span style="font-weight:bold">RSS Feed for your Workouts</span></p>
+    <p style="font-size:90%">This URL can be found by clicking on the <a href="http://www.mapmyride.com/training_data">Data Center</a> at <a href="http://www.mapmyride.com">MapMyRide.com</a> and looking for the link <span style="font-weight:bold">RSS Feed for your Workouts</span></p>
   </p>
   	<p>
 		<label for="mapmyride-items"><?php _e('How many workouts would you like to display?'); ?>
