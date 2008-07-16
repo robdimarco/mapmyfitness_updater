@@ -28,7 +28,7 @@ Plugin Name: MapMyRide Widget
 Plugin URI: http://www.innovationontherun.com/mapmyride-wordpress-plugin-released
 Description: MapMyRideWidget
 Author: Rob Di Marco
-Version: 1.0.1
+Version: 1.0.2
 Author URI: http://www.innovationontherun.com/
 */
 if (!defined('RUNNER_ICON_URL'))
