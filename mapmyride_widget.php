@@ -115,7 +115,7 @@ function mapmyride($rss, $args = array())
 			}
 			echo "</li>";
 		}
-		echo '</ul>';
+		echo '</ul><p><a href="http://www.innovationontherun.com/mapmyride-wordpress-plugin-released">Get This Widget!</a></p>';
 	} else {
 		echo '<ul><li>' . __( 'An error has occurred; the feed is probably down. Try again later.' ) . '</li></ul>';
 	}
