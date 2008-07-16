@@ -1,11 +1,5 @@
 <?php
 /*
-Plugin Name: MapMyRide Widget
-Plugin URI: http://416software.com/projects/mapmyride_widget
-Description: A widget for displaying your MayMyRide workouts on your blog.
-Author: Rob Di Marco
-Version: 1.0.0
-Author URI: http://www.416software.com
     Copyright (C) 2008, 416 Software Inc.
 
     This program is free software; you can redistribute it and/or modify
