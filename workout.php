@@ -13,6 +13,7 @@ class Workout {
     function setDetailsFromRssItem($rssItem){
         $this->title = strip_tags($rssItem['title']);
         $this->link  = $rssItem['link'];
+        $this->parseLinkForId();
         $this->setDetailArrayFromString($rssItem['description']);
     }
 
