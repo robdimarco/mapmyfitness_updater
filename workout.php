@@ -34,5 +34,19 @@ class Workout {
             $this->workoutId = substr($matches[0],strlen("txtWorkoutID="));
         }
     }
+    
+    /* This is the static comparing function: */
+    static function cmp_obj($a, $b)
+    {
+        $ua = (int)$a->workoutId;
+        $ub = (int)$b->workoutId;
+        if ($ua == $ub) {
+            return 0;
+        } elseif ($ua > $ub) {
+            return -1;
+        } else {
+            return 1;
+        }
+    }
 }
 ?>
