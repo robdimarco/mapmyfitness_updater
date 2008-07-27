@@ -1,4 +1,5 @@
 <?php
+  require_once dirname(__FILE__) . "/config.php";
   require_once dirname(__FILE__) . "/friendfeed/friendfeed.php";
   require_once dirname(__FILE__) . "/../classes/mapmyride.php";
   require_once dirname(__FILE__) . "/functions.php";
@@ -9,8 +10,8 @@
       Updating users:
       <ul>
 <?php
-  mysql_connect("localhost", "root", "admin");
-  mysql_select_db("mmr");
+  mysql_connect(DB_HOST, DB_USER, DB_PASSWORD);
+  mysql_select_db(DB_DATABASE);
   $users = mysql_query("select id,
     mmr_user_id, 
     friend_feed_user_name, 
@@ -18,7 +19,7 @@
     last_workout_id, 
     last_update_date from mmr_ff_user where is_active = 1");
     while ($row = mysql_fetch_assoc($users)) {
-        $workoutCount = 0;
+      $workoutCount = 0;
       $mmr = new MapMyRide($row['mmr_user_id']);
       $ff = new FriendFeed($row['friend_feed_user_name'], $row['friend_feed_auth_key']);
       
