@@ -10,6 +10,10 @@ class Workout {
             $this->setDetailsFromRssItem($rssItem);
         }
     }
+    
+    function getEntryDate() {
+        return $this->detailArray['Date'];
+    }
     function setDetailsFromRssItem($rssItem){
         $this->title = strip_tags($rssItem['title']);
         $this->link  = $rssItem['link'];

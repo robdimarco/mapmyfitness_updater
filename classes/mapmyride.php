@@ -8,11 +8,16 @@ if (!defined('MAP_MY_RIDE_RSS_URL')) {
 class MapMyRide {
     var $userId;
     var $workouts;
+    var $fetched;
     function MapMyRide($userId){
         $this->userId = $userId;
         $this->workouts = array();
+        $this->fetched = false;
     }
     function fetch_data() {
+        if ($this->fetched) {
+            return;
+        }
         if (!function_exists('fetch_rss')) {
             if (!defined('MAGPIE_DIR')) {
                 define('MAGPIE_DIR', dirname(__FILE__) . DIRECTORY_SEPARATOR . "magpierss". DIRECTORY_SEPARATOR);
@@ -26,6 +31,18 @@ class MapMyRide {
 		    }
 		    usort($this->workouts, array("Workout", "cmp_obj"));
 	    }
+	    $this->fetched = true;
+    }
+    function findWorkoutsSinceTime($time) {
+        $this->fetch_data();
+        $workouts = array();
+        foreach ($this->workouts as $wo) {
+            $d = strtotime($wo->getEntryDate());
+            if ($d > $time) {
+                $workouts[] = $wo;
+            }
+        }
+        return $workouts;
     }
 }
 ?>
