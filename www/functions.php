@@ -1,5 +1,5 @@
 <?php
-function addWorkoutLinkToFriendFeed($ff, $mmr, $id) {
+function addWorkoutLinkToFriendFeed($ff, $mmr, $id, $intro ="Just finished a workout: ") {
       $workout = null;
       foreach ($mmr->workouts as $wo) {
           if ($wo->workoutId == $id) {
@@ -7,7 +7,7 @@ function addWorkoutLinkToFriendFeed($ff, $mmr, $id) {
           }
       }
       if (null != $workout) {
-          $ff->publish_link($workout->title, $workout->link);
+          $ff->publish_link($intro . $workout->title, $workout->link);
       }
 
 }
