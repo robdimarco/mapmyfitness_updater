@@ -1,7 +1,7 @@
 <?php
   require_once dirname(__FILE__) . "/config.php";
   require_once dirname(__FILE__) . "/friendfeed/friendfeed.php";
-  require_once dirname(__FILE__) . "/../classes/mapmyride.php";
+  require_once dirname(__FILE__) . "/classes/mapmyride.php";
   require_once dirname(__FILE__) . "/functions.php";
 ?>
 <html>

@@ -1,6 +1,6 @@
 <?php
   require_once dirname(__FILE__) . "/friendfeed/friendfeed.php";
-  require_once dirname(__FILE__) . "/../classes/mapmyride.php";
+  require_once dirname(__FILE__) . "/classes/mapmyride.php";
   require_once dirname(__FILE__) . "/functions.php";
   $mmr = new MapMyRide(1746161);
   $mmr->fetch_data();
