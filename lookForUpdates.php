@@ -1,6 +1,7 @@
 <?php
   require_once dirname(__FILE__) . "/config.php";
   require_once dirname(__FILE__) . "/friendfeed/friendfeed.php";
+  require_once dirname(__FILE__) . "/twitter/class.twitter.php";
   require_once dirname(__FILE__) . "/classes/mapmyride.php";
   require_once dirname(__FILE__) . "/functions.php";
 ?>
@@ -14,14 +15,14 @@
   mysql_select_db(DB_DATABASE);
   $users = mysql_query("select id,
     mmr_user_id, 
-    friend_feed_user_name, 
-    friend_feed_auth_key, 
+    app_user_name, 
+    app_auth_key,
+    notify_type,
     last_workout_id, 
-    last_update_date from mmr_ff_user where is_active = 1");
+    last_update_date from mmr_notify_user where is_active = 1");
     while ($row = mysql_fetch_assoc($users)) {
       $workoutCount = 0;
       $mmr = new MapMyRide($row['mmr_user_id']);
-      $ff = new FriendFeed($row['friend_feed_user_name'], $row['friend_feed_auth_key']);
       
       if ($row['last_update_date']) {
           $searchFromTime = strtotime($row['last_update_date'])- 24*60*60;
@@ -31,9 +32,18 @@
       $lastWorkoutId = $row['last_workout_id'];
       foreach (array_reverse($mmr->findWorkoutsSinceTime($searchFromTime)) as $workout) {
           if ((int)$workout->workoutId > (int)$row['last_workout_id']) {
+          	if ($row['notify_type'] == 'friendfeed') {
+          	  $ff = new FriendFeed($row['app_user_name'], $row['app_auth_key']);
               addWorkoutLinkToFriendFeed($ff, $mmr, $workout->workoutId);
-              $workoutCount ++;
-              $lastWorkoutId = max($lastWorkoutId, $workout->workoutId);
+          	} else if ($row['notify_type'] == 'twitter') {
+          	  $twitter = new twitter();
+          	  $twitter->username=$row['app_user_name'];
+          	  $twitter->password=$row['app_auth_key'];
+          	  $twitter->user_agent=$row['MMF Updater - Issues: rob@innovationontherun.com'];
+          	  addWorkoutLinkToTwitter($twitter, $mmr, $workout->workoutId);
+          	}
+            $workoutCount ++;
+            $lastWorkoutId = max($lastWorkoutId, $workout->workoutId);
           }
       }
       mysql_query("update mmr_ff_user set last_update_date = now(), last_workout_id = {$lastWorkoutId} where id={$row['id']}");
