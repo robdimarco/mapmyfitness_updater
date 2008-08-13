@@ -19,7 +19,7 @@ function addWorkoutLinkToTwitter($twitter, $mmr, $id, $intro ="Just finished a w
           }
       }
       if (null != $workout) {
-          $twitter->status($intro . $workout->title . " " . getShortenedUrl($workout->link));
+          $twitter->update($intro . $workout->title . " " . getShortenedUrl($workout->link));
       }
 }
 
