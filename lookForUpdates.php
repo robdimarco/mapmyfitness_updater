@@ -29,7 +29,7 @@
       } else {
           $searchFromTime = time() - 24*60*60*2;
       }
-      $lastWorkoutId = $row['last_workout_id'];
+      $lastWorkoutId = (int)$row['last_workout_id'];
       foreach (array_reverse($mmr->findWorkoutsSinceTime($searchFromTime)) as $workout) {
           if ((int)$workout->workoutId > (int)$row['last_workout_id']) {
           	if ($row['notify_type'] == 'friendfeed') {
@@ -40,13 +40,13 @@
           	  $twitter->username=$row['app_user_name'];
           	  $twitter->password=$row['app_auth_key'];
           	  $twitter->user_agent=$row['MMF Updater - Issues: rob@innovationontherun.com'];
-          	  addWorkoutLinkToTwitter($twitter, $mmr, $workout->workoutId);
+          	  addWorkoutLinkToTwitter($twitter, $mmr, $workout->workoutId); 
           	}
             $workoutCount ++;
-            $lastWorkoutId = max($lastWorkoutId, $workout->workoutId);
+            $lastWorkoutId = max($lastWorkoutId, (int)$workout->workoutId);
           }
       }
-      mysql_query("update mmr_ff_user set last_update_date = now(), last_workout_id = {$lastWorkoutId} where id={$row['id']}");
+      mysql_query("update mmr_notify_user set last_update_date = now(), last_workout_id = {$lastWorkoutId} where id={$row['id']}");
         ?>
         <li>Updating user <?= $row['mmr_user_id']?> with <?= $workoutCount?> workouts.</li>
 
