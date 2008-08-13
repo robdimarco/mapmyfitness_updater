@@ -191,6 +191,17 @@ class twitter{
 	}
 
 	/**
+	 * Follows a user
+	 * @param integer|string $id the username or ID of a person you want to follow
+	 * @return string
+	 */
+	function followUser( $id )
+	{
+		$request = 'http://twitter.com/friendships/create/' . $id . $this->type;
+		return $this->objectify( $this->process($request) );
+	}
+	
+	/**
 	 * Unfollows a user
 	 * @param integer|string $id the username or ID of a person you want to unfollow
 	 * @return string
