@@ -34,8 +34,8 @@ class Workout {
         if ($link == '') {
             $link = $this ->link;
         }
-        if (preg_match('/txtWorkoutID\=[0-9]+/',$link, $matches)) {
-            $this->workoutId = substr($matches[0],strlen("txtWorkoutID="));
+        if (preg_match('/w\=[0-9]+/',$link, $matches)) {
+            $this->workoutId = substr($matches[0],strlen("w="));
         }
     }
     
